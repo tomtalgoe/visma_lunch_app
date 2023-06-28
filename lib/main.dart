@@ -1,63 +1,121 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'dart:core';
+import 'package:intl/intl.dart';
+import 'dart:async';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  int _counter = 0;
+
+  void _plussCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  void _minusCounter() {
+    setState(() {
+      _counter--;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
-      child: MaterialApp(
-        title: 'Namer App',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Lunch'),
         ),
-        home: MyHomePage(),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                '$_counter',
+                style: TextStyle(fontSize: 40),
+              ),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: _plussCounter,
+                    child: Text('+'),
+                  ),
+                  SizedBox(width: 16),
+                  ElevatedButton(
+                    onPressed: _minusCounter,
+                    child: Text(
+                      '-',
+                      style: TextStyle(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-class MyAppState extends ChangeNotifier {
-  var current = WordPair.random();
-
-  void getNext() {
-    current = WordPair.random();
-    notifyListeners();
+class AppBaren extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: DateTimeBar(),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [],
+          ),
+        ),
+      ),
+    );
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class DateTimeBar extends StatefulWidget {
+  @override
+  _DateTimeBarState createState() => _DateTimeBarState();
+}
+
+class _DateTimeBarState extends State<DateTimeBar> {
+  String formattedDateTime = '';
+
+  @override
+  void initState() {
+    super.initState();
+    updateTime();
+  }
+
+  void updateTime() {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('dd-MM-yyyy').format(now);
+    String formattedTime = DateFormat('HH:mm:ss').format(now);
+    setState(() {
+      formattedDateTime = '$formattedDate - $formattedTime';
+    });
+    Future.delayed(Duration(seconds: 1), updateTime);
+  }
+
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-
-    return Scaffold(
-      body: Column(mainAxisAlignment: MainAxisAlignment.spaceAround,crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text('Jeg skal ha lunch:'),
-          Text(appState.current.asLowerCase),
-
-          Flexible(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(height:100,
-                child: ElevatedButton(onPressed: () {
-                  appState.getNext();
-                },
-                 child: Text('Jeg skal ha lunch')),
-              ),
-            ),
-          )
-        ],
-      ),
+    return Text(
+      formattedDateTime,
+      style: TextStyle(fontSize: 18),
     );
   }
 }
